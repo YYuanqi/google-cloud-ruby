@@ -15,11 +15,18 @@
 # Fixes invalid request headers.
 # See internal issue b/277176485.
 OwlBot.modifier path: "lib/google/cloud/firestore/v1/firestore/client.rb" do |content|
+  content.gsub!(/^\s*header_params\["(database|parent|name|document.name)"\] = request\.(database|parent|name|document.name)/) do |match|
+    key = Regexp.last_match 1
+    method = Regexp.last_match 2
+    leading_whitespace = match.match(/^\s*/)[0]
+    "#{leading_whitespace}header_params[\"#{key}\"] = request.#{method}\n#{leading_whitespace}header_path = request.#{method}"
+  end
   content.gsub(/metadata\[:"x-goog-request-params"\] \|\|= request_params_header/,
-               "if @config&.metadata&.key? :\"google-cloud-resource-prefix\"
-                metadata[:\"x-goog-request-params\"] ||= @config.metadata[:\"google-cloud-resource-prefix\"].split(\"/\").each_slice(2).to_h.map { |k, v| \"#\{k\}=#\{v\}\" }.join(\"&\")
-              end
-              metadata[:\"x-goog-request-params\"] ||= request_params_header")
+               "begin
+                metadata[:\"x-goog-request-params\"] ||= header_path.split(\"/\")[0..3].each_slice(2).to_h.map { |k, v| \"#\{k[0..-2]\}_id=#\{v\}\" }.join(\"&\")
+              rescue StandardError
+                metadata[:\"x-goog-request-params\"] ||= request_params_header
+              end")
 end
 
 OwlBot.move_files
