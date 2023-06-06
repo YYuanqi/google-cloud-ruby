@@ -1,5 +1,14 @@
 # Release History
 
+### 1.45.0 (2023-06-06)
+
+#### Features
+
+* Added support for configurable upload chunk ([#20136](https://github.com/googleapis/google-cloud-ruby/issues/20136)) 
+#### Documentation
+
+* Fixed broken links in authentication documentation ([#21619](https://github.com/googleapis/google-cloud-ruby/issues/21619)) 
+
 ### 1.44.0 (2022-11-02)
 
 #### Features
